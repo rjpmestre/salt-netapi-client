@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - master
+    pull_request:
+      types: [opened, synchronize, reopened]
     tags:
       - "v*"
   pull_request:
@@ -34,6 +36,18 @@ jobs:
           java-version: '11'
       - name: Build and test with Maven
         run: mvn checkstyle:check javadoc:javadoc test package
+      - name: JaCoCo Code Coverage Report
+        id: jacoco_reporter
+        uses: PavanMudigonda/jacoco-reporter@v4.9
+        with:
+          coverage_results_path: target/site/jacoco/jacoco.xml
+          coverage_report_name: Test Coverage
+          coverage_report_title: JaCoCo
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          skip_check_run: false
+          minimum_coverage: 70
+          fail_below_threshold: true
+          publish_only_summary: true
       - name: Get branch name or tag
         if: success()
         uses: tj-actions/branch-names@v5
